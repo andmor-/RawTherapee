@@ -59,6 +59,7 @@ protected:
     Adjuster* blux;
     Adjuster* bluy;
     Adjuster* preser;
+    Adjuster* softr;
 
     Gtk::Label* labmga;
     Gtk::Box* gabox;
@@ -105,6 +106,7 @@ private:
     rtengine::ProcEvent EvICMbluy;
     rtengine::ProcEvent EvaIntent;
     rtengine::ProcEvent EvICMpreser;
+    rtengine::ProcEvent EvICMsoftr;
     rtengine::ProcEvent EvICMLabGridciexy;
     rtengine::ProcEvent EvICMfbw;
     LabGrid *labgridcie;
@@ -120,6 +122,7 @@ private:
     Gtk::Box* bluBox;
     Gtk::Box* riaHBox;
     Gtk::Box* preBox;
+    Gtk::Box* sofBox;
     Gtk::Box* iVBox;
     Gtk::Box* wTRCBox;
     Gtk::CheckButton* fbw;

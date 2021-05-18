@@ -60,6 +60,7 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, "icm", M("TP_ICM_LABEL")), iuncha
     EvICMbluy = m->newEvent(LUMINANCECURVE, "HISTORY_MSG_ICM_BLUY");
     EvaIntent = m->newEvent(LUMINANCECURVE, "HISTORY_MSG_ICM_AINTENT");
     EvICMpreser = m->newEvent(LUMINANCECURVE, "HISTORY_MSG_ICM_PRESER");
+    EvICMsoftr = m->newEvent(LUMINANCECURVE, "HISTORY_MSG_ICM_SOFTR");
     EvICMLabGridciexy = m->newEvent(LUMINANCECURVE, "HISTORY_MSG_ICL_LABGRIDCIEXY");
     EvICMfbw = m->newEvent(LUMINANCECURVE, "HISTORY_MSG_ICM_FBW");
     isBatchMode = lastToneCurve = lastApplyLookTable = lastApplyBaselineExposureOffset = lastApplyHueSatMap = false;
@@ -340,11 +341,16 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, "icm", M("TP_ICM_LABEL")), iuncha
     redVBox->pack_start(*bluBox, Gtk::PACK_EXPAND_WIDGET);
     preser = Gtk::manage(new Adjuster(M("TP_ICM_WORKING_PRESER"), 0., 100., 0.5, 0.));
     preser->setAdjusterListener(this);
+    softr = Gtk::manage(new Adjuster(M("TP_ICM_WORKING_SOFTR"), 0., 100., 0.5, 0.));
+    softr->setAdjusterListener(this);
     
     preBox = Gtk::manage(new Gtk::Box());
     preBox->pack_start(*preser, Gtk::PACK_SHRINK);
+    sofBox = Gtk::manage(new Gtk::Box());
+    sofBox->pack_start(*softr, Gtk::PACK_SHRINK);
     redVBox->pack_start(*separator1, Gtk::PACK_SHRINK);
     redVBox->pack_start(*preBox, Gtk::PACK_EXPAND_WIDGET);
+    redVBox->pack_start(*sofBox, Gtk::PACK_EXPAND_WIDGET);
     redVBox->pack_start(*separator2, Gtk::PACK_SHRINK);
 
     cielab = Gtk::manage(new Gtk::Label(M("TP_ICM_WORKING_CIEDIAG") + ":"));
@@ -520,6 +526,7 @@ void ICMPanel::neutral_pressed ()
     wGamma->setValue(defPar.workingTRCGamma);//2.4
     wSlope->setValue(defPar.workingTRCSlope);//12.92
     preser->setValue(defPar.preser);
+    softr->setValue(defPar.softr);
     fbw->set_active(defPar.fbw);
     wTRC->set_active(toUnderlying(ColorManagementParams::WorkingTrc::NONE));//reset to none
     will->set_active(toUnderlying(ColorManagementParams::Illuminant::DEFAULT));//reset to default - after wprim
@@ -864,6 +871,7 @@ void ICMPanel::read(const ProcParams* pp, const ParamsEdited* pedited)
     blux->setValue(pp->icm.blux);
     bluy->setValue(pp->icm.bluy);
     preser->setValue(pp->icm.preser);
+    softr->setValue(pp->icm.softr);
     labgridcie->setParams(pp->icm.labgridcieALow, pp->icm.labgridcieBLow, pp->icm.labgridcieAHigh, pp->icm.labgridcieBHigh, pp->icm.labgridcieGx, pp->icm.labgridcieGy, pp->icm.labgridcieWx, pp->icm.labgridcieWy, false);
 
     if (pedited) {
@@ -917,6 +925,7 @@ void ICMPanel::read(const ProcParams* pp, const ParamsEdited* pedited)
         blux->setEditedState(pedited->icm.blux  ? Edited : UnEdited);
         bluy->setEditedState(pedited->icm.bluy  ? Edited : UnEdited);
         preser->setEditedState(pedited->icm.preser  ? Edited : UnEdited);
+        softr->setEditedState(pedited->icm.softr  ? Edited : UnEdited);
 
     }
 
@@ -1167,6 +1176,7 @@ void ICMPanel::write(ProcParams* pp, ParamsEdited* pedited)
     pp->icm.bluy =  bluy->getValue();
     pp->toneCurve.fromHistMatching = false;
     pp->icm.preser =  preser->getValue();
+    pp->icm.softr =  softr->getValue();
 
     if (pedited) {
         pedited->icm.inputProfile = !iunchanged->get_active();
@@ -1203,6 +1213,7 @@ void ICMPanel::setDefaults(const ProcParams* defParams, const ParamsEdited* pedi
     blux->setDefault(defParams->icm.blux);
     bluy->setDefault(defParams->icm.bluy);
     preser->setDefault(defParams->icm.preser);
+    softr->setDefault(defParams->icm.softr);
     labgridcie->setDefault(defParams->icm.labgridcieALow, defParams->icm.labgridcieBLow , defParams->icm.labgridcieAHigh, defParams->icm.labgridcieBHigh, defParams->icm.labgridcieGx, defParams->icm.labgridcieGy, defParams->icm.labgridcieWx, defParams->icm.labgridcieWy);
 
     if (pedited) {
@@ -1216,6 +1227,7 @@ void ICMPanel::setDefaults(const ProcParams* defParams, const ParamsEdited* pedi
         bluy->setDefaultEditedState(pedited->icm.bluy ? Edited : UnEdited);
         labgridcie->setEdited((pedited->icm.labgridcieALow || pedited->icm.labgridcieBLow || pedited->icm.labgridcieAHigh || pedited->icm.labgridcieBHigh || pedited->icm.labgridcieGx || pedited->icm.labgridcieGy || pedited->icm.labgridcieWx || pedited->icm.labgridcieWy) ? Edited : UnEdited);
         preser->setDefaultEditedState(pedited->icm.preser ? Edited : UnEdited);
+        softr->setDefaultEditedState(pedited->icm.softr ? Edited : UnEdited);
 
     } else {
         wGamma->setDefaultEditedState(Irrelevant);
@@ -1227,6 +1239,7 @@ void ICMPanel::setDefaults(const ProcParams* defParams, const ParamsEdited* pedi
         blux->setDefaultEditedState(Irrelevant);
         bluy->setDefaultEditedState(Irrelevant);
         preser->setDefaultEditedState(Irrelevant);
+        softr->setDefaultEditedState(Irrelevant);
         labgridcie->setEdited(Edited);
 
     }
@@ -1260,6 +1273,8 @@ void ICMPanel::adjusterChanged(Adjuster* a, double newval)
             listener->panelChanged(EvICMbluy, costr2);
         } else if (a == preser) {
             listener->panelChanged(EvICMpreser, costr2);
+        } else if (a == softr) {
+            listener->panelChanged(EvICMsoftr, costr2);
         }
 
     }
@@ -2172,5 +2187,6 @@ void ICMPanel::setBatchMode(bool batchMode)
     blux->showEditedCB();
     bluy->showEditedCB();
     preser->showEditedCB();
+    softr->showEditedCB();
 }
 

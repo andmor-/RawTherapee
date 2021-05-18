@@ -1797,6 +1797,7 @@ struct ColorManagementParams {
     double blux;
     double bluy;
     double preser;
+    double softr;
     bool fbw;
     double labgridcieALow;
     double labgridcieBLow;

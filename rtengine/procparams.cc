@@ -2283,6 +2283,7 @@ ColorManagementParams::ColorManagementParams() :
     blux(0.0366),
     bluy(0.0001),
     preser(0.),
+    softr(0.),
     fbw(false),
     labgridcieALow(0.51763),//Prophoto red = (0.7347+0.1) * 1.81818 - 1
     labgridcieBLow(-0.33582),
@@ -2329,6 +2330,7 @@ bool ColorManagementParams::operator ==(const ColorManagementParams& other) cons
         && labgridcieWx == other.labgridcieWx
         && labgridcieWy == other.labgridcieWy
         && preser == other.preser
+        && softr == other.softr
         && fbw == other.fbw
         && aRendIntent == other.aRendIntent
         && outputProfile == other.outputProfile
@@ -6662,6 +6664,7 @@ int ProcParams::save(const Glib::ustring& fname, const Glib::ustring& fname2, bo
         saveToKeyfile(!pedited || pedited->icm.labgridcieWx, "Color Management", "LabGridcieWx", icm.labgridcieWx, keyFile);
         saveToKeyfile(!pedited || pedited->icm.labgridcieWy, "Color Management", "LabGridcieWy", icm.labgridcieWy, keyFile);
         saveToKeyfile(!pedited || pedited->icm.preser, "Color Management", "Preser", icm.preser, keyFile);
+        saveToKeyfile(!pedited || pedited->icm.softr, "Color Management", "Softr", icm.softr, keyFile);
         saveToKeyfile(!pedited || pedited->icm.fbw, "Color Management", "Fbw", icm.fbw, keyFile);
         saveToKeyfile(!pedited || pedited->icm.outputProfile, "Color Management", "OutputProfile", icm.outputProfile, keyFile);
         saveToKeyfile(
@@ -8775,6 +8778,7 @@ int ProcParams::load(const Glib::ustring& fname, ParamsEdited* pedited)
             assignFromKeyfile(keyFile, "Color Management", "Blux", pedited, icm.blux, pedited->icm.blux);
             assignFromKeyfile(keyFile, "Color Management", "Bluy", pedited, icm.bluy, pedited->icm.bluy);
             assignFromKeyfile(keyFile, "Color Management", "Preser", pedited, icm.preser, pedited->icm.preser);
+            assignFromKeyfile(keyFile, "Color Management", "Softr", pedited, icm.softr, pedited->icm.softr);
             assignFromKeyfile(keyFile, "Color Management", "Fbw", pedited, icm.fbw, pedited->icm.fbw);
             assignFromKeyfile(keyFile, "Color Management", "LabGridcieALow", pedited, icm.labgridcieALow, pedited->icm.labgridcieALow);
             assignFromKeyfile(keyFile, "Color Management", "LabGridcieBLow", pedited, icm.labgridcieBLow, pedited->icm.labgridcieBLow);

@@ -30,6 +30,7 @@
 #include "rtengine.h"
 #include "settings.h"
 #include "utils.h"
+#include "guidedfilter.h"
 
 namespace rtengine
 {
@@ -412,7 +413,7 @@ void ImProcFunctions::preserv(LabImage *nprevl, LabImage *provis, int cw, int ch
         }
 }
 
-void ImProcFunctions::workingtrc(const Imagefloat* src, Imagefloat* dst, int cw, int ch, int mul, Glib::ustring &profile, double gampos, double slpos, int &illum, int prim, cmsHTRANSFORM &transform, bool normalizeIn, bool normalizeOut, bool keepTransForm) const
+void ImProcFunctions::workingtrc(int sk, const Imagefloat* src, Imagefloat* dst, int cw, int ch, int mul, Glib::ustring &profile, double gampos, double slpos, int &illum, int prim, cmsHTRANSFORM &transform, bool normalizeIn, bool normalizeOut, bool keepTransForm) const
 {
     const TMatrix wprof = ICCStore::getInstance()->workingSpaceMatrix(params->icm.workingProfile);
 
@@ -913,6 +914,56 @@ void ImProcFunctions::workingtrc(const Imagefloat* src, Imagefloat* dst, int cw,
                 }
             }
         }
+        //soft result
+        float rad = 0.1f * params->icm.softr;
+        if(rad > 0.f) {
+            array2D<float> guide(cw, ch);
+            array2D<float> red(cw, ch);
+            array2D<float> green(cw, ch);
+            array2D<float> blue(cw, ch);
+#ifdef _OPENMP
+        #pragma omp parallel for
+#endif
+            for (int y = 0; y < ch; ++y) {
+                for (int x = 0; x < cw; ++x){
+                    red[y][x] = dst->r(y, x)/65536.f;
+                    green[y][x] = dst->g(y, x)/65536.f;
+                    blue[y][x] = dst->b(y, x)/65536.f;
+                }
+            }
+
+#ifdef _OPENMP
+        #pragma omp parallel for
+#endif
+            for (int y = 0; y < ch; ++y) {
+                for (int x = 0; x < cw; ++x) {
+                    guide[y][x] = (0.212f * dst->r(y, x) + 0.715f * dst->g(y,x) + 0.08f * dst->b(y, x))/65536.f;
+                }
+            }
+            const float epsilmax = 0.01f;
+            const float epsilmin = 0.001f;
+            const float thres = 0.01f;
+            const float aepsil = (epsilmax - epsilmin) / 1000.f;
+            const float bepsil = epsilmin;
+            const float epsil = aepsil * rad + bepsil;
+            const float blur = 10.f / sk * (thres + 0.8f * rad);
+
+            guidedFilter(guide, red, red, blur, epsil, true, 1);
+            guidedFilter(guide, green, green, blur, epsil, true, 1);
+            guidedFilter(guide, blue, blue, blur, epsil, true, 1);
+        
+#ifdef _OPENMP
+        #pragma omp parallel for
+#endif
+            for (int y = 0; y < ch; ++y) {
+                for (int x = 0; x < cw; ++x){
+                    dst->r(y, x) = red[y][x] * 65536.f;
+                    dst->g(y, x) = green[y][x] * 65536.f;
+                    dst->b(y, x) = blue[y][x] * 65536.f;
+                }
+            }
+        }
+
         if (!keepTransForm) {
             cmsDeleteTransform(hTransform);
             hTransform = nullptr;
