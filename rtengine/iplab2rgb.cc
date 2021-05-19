@@ -915,12 +915,13 @@ void ImProcFunctions::workingtrc(int sk, const Imagefloat* src, Imagefloat* dst,
             }
         }
         //soft result
-        float rad = 0.1f * params->icm.softr;
+        float rad = params->icm.softr;
         if(rad > 0.f) {
             array2D<float> guide(cw, ch);
             array2D<float> red(cw, ch);
             array2D<float> green(cw, ch);
             array2D<float> blue(cw, ch);
+
 #ifdef _OPENMP
         #pragma omp parallel for
 #endif
@@ -940,18 +941,12 @@ void ImProcFunctions::workingtrc(int sk, const Imagefloat* src, Imagefloat* dst,
                     guide[y][x] = (0.212f * dst->r(y, x) + 0.715f * dst->g(y,x) + 0.08f * dst->b(y, x))/65536.f;
                 }
             }
-            const float epsilmax = 0.01f;
-            const float epsilmin = 0.001f;
+            float epsil = 0.01f;
             const float thres = 0.01f;
-            const float aepsil = (epsilmax - epsilmin) / 1000.f;
-            const float bepsil = epsilmin;
-            const float epsil = aepsil * rad + bepsil;
-            const float blur = 10.f / sk * (thres + 0.8f * rad);
-
+            const float blur = 0.25f / sk * (thres + 0.8f * rad);
             guidedFilter(guide, red, red, blur, epsil, true, 1);
             guidedFilter(guide, green, green, blur, epsil, true, 1);
             guidedFilter(guide, blue, blue, blur, epsil, true, 1);
-        
 #ifdef _OPENMP
         #pragma omp parallel for
 #endif

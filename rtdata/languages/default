@@ -1354,7 +1354,7 @@ HISTORY_MSG_ICM_AINTENT;Abstract profile intent
 HISTORY_MSG_ILLUM;Illuminant
 HISTORY_MSG_ICM_FBW;Black and White
 HISTORY_MSG_ICM_PRESER;Preserve neutral
-HISTORY_MSG_ICM_SOFTR;Soft radius
+HISTORY_MSG_ICM_SOFTR;Soft radius & Blur
 HISTORY_MSG_LOCALCONTRAST_AMOUNT;Local Contrast - Amount
 HISTORY_MSG_LOCALCONTRAST_DARKNESS;Local Contrast - Darkness
 HISTORY_MSG_LOCALCONTRAST_ENABLED;Local Contrast
@@ -2453,7 +2453,7 @@ TP_ICM_SAVEREFERENCE;Save Reference Image
 TP_ICM_SAVEREFERENCE_APPLYWB;Apply white balance
 TP_ICM_SAVEREFERENCE_APPLYWB_TOOLTIP;Generally, apply the white balance when saving images to create ICC profiles, and do not apply the white balance to create DCP profiles.
 TP_ICM_SAVEREFERENCE_TOOLTIP;Save the linear TIFF image before the input profile is applied. The result can be used for calibration purposes and generation of a camera profile.
-TP_ICM_WORKING_SOFTR;Soft radius
+TP_ICM_WORKING_SOFTR;Soft radius & Blur
 TP_ICM_TONECURVE;Tone curve
 TP_ICM_TONECURVE_TOOLTIP;Employ the embedded DCP tone curve. The setting is only available if the selected DCP has a tone curve.
 TP_ICM_TRCFRAME;Abstract Profile
