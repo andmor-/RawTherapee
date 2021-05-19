@@ -1635,7 +1635,7 @@ void ImProcCoordinator::updatePreviewImage(int todo, bool panningRelatedChange)
                 const int GW = nprevl->W;
                 const int GH = nprevl->H;
                 std::unique_ptr<LabImage> provis;
-                const float pres = 0.f; //0.01f * params->icm.preser;
+                const float pres = 0.01f * params->icm.preser;
                 if (pres > 0.f && params->icm.wprim != ColorManagementParams::Primaries::DEFAULT) {
                     provis.reset(new LabImage(GW, GH));
                     provis->CopyFrom(nprevl);
