@@ -12014,7 +12014,7 @@ void ImProcFunctions::Lab_Local(
                         int r = rtengine::max(int(lp.guidb / sk), 1);
 
                         const float epsil = 0.001f * std::pow(2.f, -lp.epsb);
-
+                        printf("r=%f epsil=%f\n", (double) r, (double) epsil);
                         if (lp.chromet == 0) {
                             rtengine::guidedFilterLog(guide, 10.f, LL, r, epsil, multiThread);
                         } else if (lp.chromet == 1) {

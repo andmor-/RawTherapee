@@ -341,7 +341,7 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, "icm", M("TP_ICM_LABEL")), iuncha
     redVBox->pack_start(*bluBox, Gtk::PACK_EXPAND_WIDGET);
     preser = Gtk::manage(new Adjuster(M("TP_ICM_WORKING_PRESER"), 0., 100., 0.5, 0.));
     preser->setAdjusterListener(this);
-    softr = Gtk::manage(new Adjuster(M("TP_ICM_WORKING_SOFTR"), 0., 100., 0.1, 0.));
+    softr = Gtk::manage(new Adjuster(M("TP_ICM_WORKING_SOFTR"), -100., 100., 0.1, 0.));
     softr->setAdjusterListener(this);
     
     preBox = Gtk::manage(new Gtk::Box());

@@ -1536,6 +1536,37 @@ void Crop::update(int todo)
                     labnCrop->b[x][y] = 0.f;
                 }
             }
+            
+            float rad = params.icm.softr;
+            if (rad > 0.f) {
+                array2D<float> guide(GW, GH);
+                array2D<float> LL(GW, GH);
+#ifdef _OPENMP
+                #pragma omp parallel for schedule(dynamic,16)
+#endif
+                for (int y = 0; y < GH ; y++) {
+                    for (int x = 0; x < GW; x++) {
+                        LL[y][x] = labnCrop->L[y][x];
+                        float ll = LL[y][x] / 32768.f;
+                        guide[y][x] = xlin2log(rtengine::max(ll, 0.f), 10.f);
+                    }
+                }
+                array2D<float> iL(GW, GH, LL, 0);
+                float gu = 10.f * params.icm.softr;
+                int r = rtengine::max(int(gu / skip), 1);
+                const float epsil = 0.001f * std::pow(2.f, -10);
+                float st = 0.01f * params.icm.softr;
+                rtengine::guidedFilterLog(guide, 10.f, LL, r, epsil, false);
+#ifdef _OPENMP
+                #pragma omp parallel for schedule(dynamic,16)
+#endif
+                for (int y = 0; y < GH ; y++) {
+                    for (int x = 0; x < GW; x++) {
+                        LL[y][x] = intp(st, LL[y][x] , iL[y][x]);
+                        labnCrop->L[y][x] = LL[y][x];
+                    }
+                }
+            }
         }
 
         if (params.colorappearance.enabled) {

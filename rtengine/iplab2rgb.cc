@@ -416,7 +416,20 @@ void ImProcFunctions::preserv(LabImage *nprevl, LabImage *provis, int cw, int ch
 void ImProcFunctions::workingtrc(int sk, const Imagefloat* src, Imagefloat* dst, int cw, int ch, int mul, Glib::ustring &profile, double gampos, double slpos, int &illum, int prim, cmsHTRANSFORM &transform, bool normalizeIn, bool normalizeOut, bool keepTransForm) const
 {
     const TMatrix wprof = ICCStore::getInstance()->workingSpaceMatrix(params->icm.workingProfile);
+//    const TMatrix wiprof = ICCStore::getInstance()->workingSpaceInverseMatrix(params->icm.workingProfile);
+/*
+    double wip[3][3] = {
+        {wiprof[0][0], wiprof[0][1], wiprof[0][2]},
+        {wiprof[1][0], wiprof[1][1], wiprof[1][2]},
+        {wiprof[2][0], wiprof[2][1], wiprof[2][2]}
+    };
 
+    double wp[3][3] = {
+        {wprof[0][0], wprof[0][1], wprof[0][2]},
+        {wprof[1][0], wprof[1][1], wprof[1][2]},
+        {wprof[2][0], wprof[2][1], wprof[2][2]}
+    };
+*/
     const float toxyz[3][3] = {
         {
             static_cast<float>(wprof[0][0] / ((normalizeIn ? 65535.0 : 1.0))), //I have suppressed / Color::D50x
@@ -914,9 +927,10 @@ void ImProcFunctions::workingtrc(int sk, const Imagefloat* src, Imagefloat* dst,
                 }
             }
         }
-        //soft result
+        //soft result in case artifacts or blur
         float rad = params->icm.softr;
-        if(rad > 0.f) {
+        if(rad < 0.f) {
+            rad = -rad;
             array2D<float> guide(cw, ch);
             array2D<float> red(cw, ch);
             array2D<float> green(cw, ch);
@@ -941,12 +955,14 @@ void ImProcFunctions::workingtrc(int sk, const Imagefloat* src, Imagefloat* dst,
                     guide[y][x] = (0.212f * dst->r(y, x) + 0.715f * dst->g(y,x) + 0.08f * dst->b(y, x))/65536.f;
                 }
             }
+            
             float epsil = 0.01f;
             const float thres = 0.01f;
             const float blur = 0.25f / sk * (thres + 0.8f * rad);
             guidedFilter(guide, red, red, blur, epsil, true, 1);
             guidedFilter(guide, green, green, blur, epsil, true, 1);
             guidedFilter(guide, blue, blue, blur, epsil, true, 1);
+
 #ifdef _OPENMP
         #pragma omp parallel for
 #endif
