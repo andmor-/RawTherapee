@@ -416,20 +416,6 @@ void ImProcFunctions::preserv(LabImage *nprevl, LabImage *provis, int cw, int ch
 void ImProcFunctions::workingtrc(int sk, const Imagefloat* src, Imagefloat* dst, int cw, int ch, int mul, Glib::ustring &profile, double gampos, double slpos, int &illum, int prim, cmsHTRANSFORM &transform, bool normalizeIn, bool normalizeOut, bool keepTransForm) const
 {
     const TMatrix wprof = ICCStore::getInstance()->workingSpaceMatrix(params->icm.workingProfile);
-//    const TMatrix wiprof = ICCStore::getInstance()->workingSpaceInverseMatrix(params->icm.workingProfile);
-/*
-    double wip[3][3] = {
-        {wiprof[0][0], wiprof[0][1], wiprof[0][2]},
-        {wiprof[1][0], wiprof[1][1], wiprof[1][2]},
-        {wiprof[2][0], wiprof[2][1], wiprof[2][2]}
-    };
-
-    double wp[3][3] = {
-        {wprof[0][0], wprof[0][1], wprof[0][2]},
-        {wprof[1][0], wprof[1][1], wprof[1][2]},
-        {wprof[2][0], wprof[2][1], wprof[2][2]}
-    };
-*/
     const float toxyz[3][3] = {
         {
             static_cast<float>(wprof[0][0] / ((normalizeIn ? 65535.0 : 1.0))), //I have suppressed / Color::D50x
@@ -956,12 +942,23 @@ void ImProcFunctions::workingtrc(int sk, const Imagefloat* src, Imagefloat* dst,
                 }
             }
             
-            float epsil = 0.01f;
+            float epsilmax = 0.01f;
+            float epsilmin = 0.0001f;
+            const float aepsil = (epsilmax - epsilmin) / 100.f;
+            const float bepsil = epsilmin;
+            const float epsil = aepsil * rad + bepsil;
             const float thres = 0.01f;
-            const float blur = 0.25f / sk * (thres + 0.8f * rad);
-            guidedFilter(guide, red, red, blur, epsil, true, 1);
-            guidedFilter(guide, green, green, blur, epsil, true, 1);
-            guidedFilter(guide, blue, blue, blur, epsil, true, 1);
+            const float thresrad = 60.f;
+            
+            const float blur = 0.25f / sk * (thres + rad);
+            const float blurrb = 0.25f / sk * (thres + (1.f + (rad - thresrad)));
+            
+            guidedFilter(guide, green, green, blur, epsil, true, 1);//less artifacts blur only green
+            if(rad > thresrad) {//blur image
+                guidedFilter(guide, blue, blue, blurrb, epsil, true, 1);
+                guidedFilter(guide, red, red, blurrb, epsil, true, 1);
+            }
+                
 
 #ifdef _OPENMP
         #pragma omp parallel for

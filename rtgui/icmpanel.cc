@@ -343,6 +343,7 @@ ICMPanel::ICMPanel() : FoldableToolPanel(this, "icm", M("TP_ICM_LABEL")), iuncha
     preser->setAdjusterListener(this);
     softr = Gtk::manage(new Adjuster(M("TP_ICM_WORKING_SOFTR"), -100., 100., 0.1, 0.));
     softr->setAdjusterListener(this);
+    softr->set_tooltip_text(M("TP_ICM_WORKING_SOFTR_TOOLTIP"));
     
     preBox = Gtk::manage(new Gtk::Box());
     preBox->pack_start(*preser, Gtk::PACK_SHRINK);
