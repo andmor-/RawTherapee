@@ -1698,6 +1698,7 @@ TP_ICM_SAVEREFERENCE_TOOLTIP;Sauvegarde une image TIFF linéaire avant que le pr
 TP_ICM_TONECURVE;Utiliser la courbe tonale du profil DCP
 TP_ICM_TONECURVE_TOOLTIP;Utilise la courbe tonale DCP incluse. Ce paramètre ne sera actif que si le profil DCP contient une courbe tonale
 TP_ICM_WORKINGPROFILE;Profil de Travail
+TP_ICM_WORKING_SOFTR_TOOLTIP;A n'utiliser que dans de rares cas.\n Si a) des artefacts apparaissent, notamment pour le choix noir et blanc, le canal vert est adouci [0 -60[, ou b) si vous souhaitez flouter l'image [-60 -100].\n Pour augmenter le contraste local [0 100], notamment si les primaires ont été élargies au delà du spectre visible.
 TP_ICM_WORKING_TRC;Courbe de réponse tonale:
 TP_ICM_WORKING_TRC_CUSTOM;Personnalisé
 TP_ICM_WORKING_TRC_GAMMA;Gamma
