@@ -376,17 +376,17 @@ else()
 endif()
 
 if(APPLE)
-    if("${CODESIGNID}")
+    if(DEFINED CODESIGNID)
         set(CODESIGNID
             "${CODESIGNID}"
             CACHE STRING "Codesigning Identity")
     endif()
-    if("${NOTARY}")
+    if(DEFINED NOTARY)
         set(NOTARY
             "${NOTARY}"
             CACHE STRING "Notarization Identity")
     endif()
-    if("${LOCAL_PREFIX}")
+    if(DEFINED LOCAL_PREFIX)
         set(LOCAL_PREFIX
             "${LOCAL_PREFIX}"
             CACHE STRING "macos/gtk parent directory ie /usr/local or /opt/local or /opt/homebrew (for arm64)")
@@ -395,7 +395,7 @@ if(APPLE)
             /usr/local
             CACHE STRING "macos/gtk parent directory ie /usr/local (default) or /opt/local (macports) or /opt/homebrew (for arm64)")
     endif()
-    if("${FANCY_DMG}")
+    if(DEFINED FANCY_DMG)
         set(FANCY_DMG
             ON
             CACHE BOOL
