@@ -91,7 +91,7 @@ if [[ -z $MINIMUM_SYSTEM_VERSION ]]; then
     MINIMUM_SYSTEM_VERSION="$(sw_vers -productVersion | cut -d. -f-2)"
 fi
 
-arch=x86_64
+arch=$(uname -m)
 
 cat <<__EOS__
 PROJECT_NAME:           ${PROJECT_NAME}
@@ -189,7 +189,7 @@ ModifyInstallNames
 ditto ${LOCAL_PREFIX}/lib/libjpeg.62.dylib "${CONTENTS}/Frameworks/libjpeg.62.dylib"
 
 # Copy libexpat into the app bundle (which is keg-only)
-if [[ -d /usr/local/Cellar/expat ]]; then ditto /usr/local/Cellar/expat/*/lib/libexpat.1.dylib "${CONTENTS}/Frameworks"; else ditto "${EXPATLIB}" "${CONTENTS}/Frameworks/libexpat.1.dylib"; fi
+if [[ -d ${LOCAL_PREFIX}/Cellar/expat ]]; then ditto ${LOCAL_PREFIX}/Cellar/expat/*/lib/libexpat.1.dylib "${CONTENTS}/Frameworks"; else ditto "${EXPATLIB}" "${CONTENTS}/Frameworks/libexpat.1.dylib"; fi
 
 # Copy libz into the app bundle
 ditto ${LOCAL_PREFIX}/lib/libz.1.dylib "${CONTENTS}/Frameworks"
@@ -217,8 +217,8 @@ find -E "${LIB}" -type f -regex '.*\.(a|la|cache)$' | while read -r; do rm "${RE
 msg "Flattening the Frameworks folder"
 cp -RL "${LIB}"/gdk-pixbuf-2.0/2*/loaders/* "${LIB}"
 cp "${LIB}"/gtk-3.0/3*/immodules/*.{dylib,so} "${LIB}"
-rm -r "${LIB}"/gtk-3.0
-rm -r "${LIB}"/gdk-pixbuf-2.0
+rm -rf "${LIB}"/gtk-3.0
+rm -rf "${LIB}"/gdk-pixbuf-2.0
 
 # GTK+3 themes
 msg "Copy GTK+3 theme and icon resources:"
