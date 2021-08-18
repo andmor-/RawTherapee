@@ -513,9 +513,15 @@ endif()
 if(WITH_LTO)
     # Using LTO with older versions of binutils requires setting extra flags
     set(BINUTILS_VERSION_MININUM "2.29")
-    execute_process(COMMAND ar --version
-                    OUTPUT_VARIABLE BINUTILS_VERSION_DETECTED)
-    string(REGEX REPLACE ".* ([0-9.]+)\n.*" "\\1" BINUTILS_VERSION_DETECTED
+    if(APPLE)
+        execute_process(COMMAND clang --version
+            OUTPUT_VARIABLE BINUTILS_VERSION_DETECTED)
+    else()
+        execute_process(COMMAND ar --version
+            OUTPUT_VARIABLE BINUTILS_VERSION_DETECTED)
+    endif()
+
+    string(REGEX REPLACE ".* ([0-9.]+).*\n.*" "\\1" BINUTILS_VERSION_DETECTED
                          "${BINUTILS_VERSION_DETECTED}")
     if("${BINUTILS_VERSION_DETECTED}" VERSION_LESS
        "${BINUTILS_VERSION_MININUM}")
