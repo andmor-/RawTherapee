@@ -25,5 +25,5 @@ cmake -DCMAKE_BUILD_TYPE="release" \
       ..
 
 
-make -j$(sysctl -n hw.ncpu) install
+make -j$(($(nproc)+1)) install
 make macosx_bundle)
