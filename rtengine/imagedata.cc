@@ -332,6 +332,9 @@ FrameData::FrameData(rtexif::TagDirectory* frameRootDir_, rtexif::TagDirectory* 
                 lens = validateUft8(exif->getTag("LensModel")->valueToString());
             }
         } else if (!make.compare(0, 4, "SONY")) {
+            if (exif->getTag("LensModel")) {
+                lens = validateUft8(exif->getTag("LensModel")->valueToString());
+            }
             if (iso_speed == 65535 || iso_speed == 0) {
                 rtexif::Tag* isoTag = exif->getTag("RecommendedExposureIndex");
 
