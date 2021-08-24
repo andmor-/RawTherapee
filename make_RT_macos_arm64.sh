@@ -11,11 +11,10 @@ rm -rf build
 mkdir -p build 
 
 (cd build
-cmake -DCMAKE_BUILD_TYPE="release" \
+cmake -DCMAKE_BUILD_TYPE="Release" \
       -DLOCAL_PREFIX="$(brew --prefix)" \
       -DPROC_TARGET_NUMBER="2" \
       -DCODESIGNID="Apple Development: example@example.com (XXXXXXXXXX)" \
-      -DOSX_DEV_BUILD="ON" \
       -DCACHE_NAME_SUFFIX="5.8-dev" \
       -DCMAKE_C_COMPILER="clang" \
       -DCMAKE_CXX_COMPILER="clang++" \
@@ -23,7 +22,6 @@ cmake -DCMAKE_BUILD_TYPE="release" \
       -DLENSFUNDBDIR="../../lensfun/data/db/" \
       -DCMAKE_OSX_DEPLOYMENT_TARGET="11.3" \
       ..
-
 
 make -j$(($(nproc)+1)) install
 make macosx_bundle)
