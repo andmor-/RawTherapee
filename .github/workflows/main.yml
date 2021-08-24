@@ -32,6 +32,7 @@ jobs:
         env:
           CMAKE_CXX_STANDARD: 12
           PKG_CONFIG_PATH: /usr/local/opt/libtiff/lib/pkgconfig:/usr/local/opt/libffi/lib/pkgconfig:/usr/local/opt/expat/lib/pkgconfig
+          LDFLAGS: -L/opt/homebrew/lib -Wl,-rpath,/opt/homebrew/lib -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib
           RAW_THERAPEE_MAJOR: '5'
           RAW_THERAPEE_MINOR: '8'
         run: |
@@ -41,16 +42,14 @@ jobs:
           export REF=${GITHUB_REF##*/}
           export C_FLAGS=$(echo -e $C_FLAGS | tr -d '\n')
           cd build && date -u && date +%s > configstamp
-          cmake -DCMAKE_BUILD_TYPE="release" \
+          cmake -DCMAKE_BUILD_TYPE="Release" \
                 -DLOCAL_PREFIX="$(brew --prefix)" \
                 -DPROC_TARGET_NUMBER="2" \
                 -DCODESIGNID="Apple Development: andre@clarin.eu (LD66Z2PUV6)" \
-                -DOSX_DEV_BUILD="ON" \
                 -DCACHE_NAME_SUFFIX="5.8-dev" \
                 -DCMAKE_C_COMPILER="clang" \
                 -DCMAKE_CXX_COMPILER="clang++" \
                 -DWITH_LTO="ON" \
-                -DLENSFUNDBDIR="../../lensfun/data/db/" \
                 -DCMAKE_OSX_DEPLOYMENT_TARGET="11.3" \
                 ..
             zsh -c 'echo "Configured in $(printf "%0.2f" $(($[$(date +%s)-$(cat configstamp)]/$((60.))))) minutes"'
