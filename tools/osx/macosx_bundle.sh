@@ -86,12 +86,20 @@ if [[ -x $(which git) && -d $PROJECT_SOURCE_DIR/.git ]]; then
     PROJECT_VERSION="$gitVersionNumericBS"
 fi
 
+#In: CMAKE_OSX_DEPLOYMENT_TARGET=11.3
+#Out: 11.3
+CMAKE_OSX_DEPLOYMENT_TARGET="$(cmake .. -L -N | grep CMAKE_OSX_DEPLOYMENT_TARGET)"; CMAKE_OSX_DEPLOYMENT_TARGET="${CMAKE_OSX_DEPLOYMENT_TARGET#*=}"
+
+#In: CMAKE_OSX_ARCHITECTURES=x86_64
+#Out: x86_64
+CMAKE_OSX_ARCHITECTURES="$(cmake .. -L -N | grep CMAKE_OSX_ARCHITECTURES)"; CMAKE_OSX_ARCHITECTURES="${CMAKE_OSX_ARCHITECTURES#*=}"
+
 MINIMUM_SYSTEM_VERSION="$(otool -l "${CMAKE_BUILD_TYPE}"/MacOS/rawtherapee | grep -A2 'LC_VERSION_MIN_MACOSX' | awk '$1 ~ /version/ { printf $2 }')"
 if [[ -z $MINIMUM_SYSTEM_VERSION ]]; then
     MINIMUM_SYSTEM_VERSION="$(sw_vers -productVersion | cut -d. -f-2)"
 fi
 
-arch=$(uname -m)
+arch=${CMAKE_OSX_ARCHITECTURES}
 
 cat <<__EOS__
 PROJECT_NAME:           ${PROJECT_NAME}
