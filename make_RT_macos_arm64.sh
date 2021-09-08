@@ -20,7 +20,8 @@ cmake -DCMAKE_BUILD_TYPE="Release" \
       -DCMAKE_CXX_COMPILER="clang++" \
       -DWITH_LTO="ON" \
       -DLENSFUNDBDIR="../../lensfun/data/db/" \
-      -DCMAKE_OSX_DEPLOYMENT_TARGET="11.3" \
+      -DCMAKE_OSX_DEPLOYMENT_TARGET="11.5" \
+      -DCMAKE_OSX_ARCHITECTURES="arm64" \
       ..
 
 make -j$(($(nproc)+1)) install
