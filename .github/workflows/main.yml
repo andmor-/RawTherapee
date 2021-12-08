@@ -30,12 +30,12 @@ jobs:
            cat depslog | grep Pouring
            zsh -c 'echo "Completed installation of dependencies in $(printf "%0.2f" $(($[$(date +%s)-$(cat build/stamp)]/$((60.))))) minutes"'
       - name: Configure build system
+        env:
+          C_FLAGS: >
+            -arch arm64 -mtune=generic -Xpreprocessor -fopenmp /usr/local/lib/libomp.dylib -I/usr/local/include -I/usr/local/opt/gdk-pixbuf/include -I/usr/local/opt/libiconv/include -I/usr/local/opt/libxml2/include -I/usr/local/opt/expat/include -I/usr/local/opt/libtiff/include
         run: |
-          # GITHUB_REF is the ref that triggered the build, like
-          # refs/heads/new-feature - the next line parses that to REF: the branch
-          # name only (new-feature)
-          export REF=${GITHUB_REF##*/}
           cd build && date -u && date +%s > configstamp
+          export C_FLAGS=$(echo -e $C_FLAGS | tr -d '\n')
           cmake -DCMAKE_BUILD_TYPE="Release" \
                 -DLOCAL_PREFIX="$(brew --prefix)" \
                 -DPROC_TARGET_NUMBER="2" \
@@ -43,6 +43,7 @@ jobs:
                 -DCACHE_NAME_SUFFIX="5.8-dev" \
                 -DCMAKE_C_COMPILER="clang" \
                 -DCMAKE_CXX_COMPILER="clang++" \
+                -DCMAKE_C_FLAGS="-arch arm64 -Wno-pass-failed -Wno-deprecated-register -Wno-unused-command-line-argument" \
                 -DWITH_LTO="ON" \
                 -DCMAKE_OSX_DEPLOYMENT_TARGET="12" \
                 ..
