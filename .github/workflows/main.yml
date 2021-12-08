@@ -30,12 +30,6 @@ jobs:
            cat depslog | grep Pouring
            zsh -c 'echo "Completed installation of dependencies in $(printf "%0.2f" $(($[$(date +%s)-$(cat build/stamp)]/$((60.))))) minutes"'
       - name: Configure build system
-        env:
-          CMAKE_CXX_STANDARD: 12
-          PKG_CONFIG_PATH: /usr/local/opt/libtiff/lib/pkgconfig:/usr/local/opt/libffi/lib/pkgconfig:/usr/local/opt/expat/lib/pkgconfig
-          LDFLAGS: -L/opt/homebrew/lib -Wl,-rpath,/opt/homebrew/lib -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib
-          RAW_THERAPEE_MAJOR: '5'
-          RAW_THERAPEE_MINOR: '8'
         run: |
           # GITHUB_REF is the ref that triggered the build, like
           # refs/heads/new-feature - the next line parses that to REF: the branch
