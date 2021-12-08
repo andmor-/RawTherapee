@@ -41,7 +41,6 @@ jobs:
           # refs/heads/new-feature - the next line parses that to REF: the branch
           # name only (new-feature)
           export REF=${GITHUB_REF##*/}
-          export C_FLAGS=$(echo -e $C_FLAGS | tr -d '\n')
           cd build && date -u && date +%s > configstamp
           cmake -DCMAKE_BUILD_TYPE="Release" \
                 -DLOCAL_PREFIX="$(brew --prefix)" \
@@ -51,7 +50,7 @@ jobs:
                 -DCMAKE_C_COMPILER="clang" \
                 -DCMAKE_CXX_COMPILER="clang++" \
                 -DWITH_LTO="ON" \
-                -DCMAKE_OSX_DEPLOYMENT_TARGET="11.5" \
+                -DCMAKE_OSX_DEPLOYMENT_TARGET="12" \
                 ..
             zsh -c 'echo "Configured in $(printf "%0.2f" $(($[$(date +%s)-$(cat configstamp)]/$((60.))))) minutes"'
       - name: Compile RawTherapee
