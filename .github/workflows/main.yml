@@ -23,11 +23,12 @@ jobs:
            date -u
            mkdir build
            date +%s > build/stamp
-           brew uninstall --ignore-dependencies libtiff
-           brew install libtiff gtk+3 gtkmm3 gtk-mac-integration adwaita-icon-theme libsigc++@2 little-cms2 libiptcdata fftw lensfun expat libomp shared-mime-info | tee -a depslog
-           brew unlink libomp
-           curl -O https://raw.githubusercontent.com/Homebrew/homebrew-core/fb8323f2b170bd4ae97e1bac9bf3e2983af3fdb0/Formula/libomp.rb
-           brew install ./libomp.rb
+           arch -arm64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+           arch -arm64 brew uninstall --ignore-dependencies libtiff
+           arch -arm64 brew install libtiff gtk+3 gtkmm3 gtk-mac-integration adwaita-icon-theme libsigc++@2 little-cms2 libiptcdata fftw lensfun expat libomp shared-mime-info | tee -a depslog
+           arch -arm64 brew unlink libomp
+           curl -O -L https://raw.githubusercontent.com/Homebrew/homebrew-core/fb8323f2b170bd4ae97e1bac9bf3e2983af3fdb0/Formula/libomp.rb
+           arch -arm64 brew install ./libomp.rb
            rm -f ./libomp.rb
            date -u
            echo "----====Pourage====----"
