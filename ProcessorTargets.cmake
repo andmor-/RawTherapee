@@ -11,7 +11,7 @@ set(PROC_TARGET_2_LABEL native CACHE STRING "Processor-2 label - use it for your
 if(CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL arm64)
     set(PROC_TARGET_2_FLAGS "-mcpu=native" CACHE STRING "Processor-2 flags")
 else()
-    set(PROC_TARGET_2_FLAGS "-march=native" CACHE STRING "Processor-2 flags")
+    set(PROC_TARGET_2_FLAGS "-mcpu=apple-m1" CACHE STRING "Processor-2 flags")
 endif()
 
 # The later choices is intended to be used if you want to provide specific builds, but it should match your own processor
