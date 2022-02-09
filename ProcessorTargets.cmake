@@ -9,7 +9,7 @@ set(PROC_TARGET_2_LABEL native CACHE STRING "Processor-2 label - use it for your
 
 # The flag is different on x86 and Arm based processors
 if(CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL arm64)
-    set(PROC_TARGET_2_FLAGS "-mcpu=native" CACHE STRING "Processor-2 flags")
+    set(PROC_TARGET_2_FLAGS "-mcpu=apple-m1" CACHE STRING "Processor-2 flags")
 else()
     set(PROC_TARGET_2_FLAGS "-mcpu=apple-m1" CACHE STRING "Processor-2 flags")
 endif()
