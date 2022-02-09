@@ -48,7 +48,6 @@ jobs:
           cmake -DCMAKE_BUILD_TYPE="Release" \
                 -DPROC_TARGET_NUMBER="2" \
                 -DCMAKE_EXE_LINKER_FLAGS="-L. -L/usr/local/lib -Wl,-rpath -Wl,/usr/local/lib -L/usr/local/opt/gdk-pixbuf/lib -L/usr/local/opt/libiconv/lib -L/usr/local/opt/libffi/lib -L/usr/local/opt/libffi/lib -L/usr/local/opt/libxml2/lib -L/usr/local/opt/expat/lib" \
-                -DCODESIGNID="Apple Development: andre@clarin.eu (LD66Z2PUV6)" \
                 -DCACHE_NAME_SUFFIX="${RAW_THERAPEE_MAJOR}.${RAW_THERAPEE_MINOR}-${REF}" \
                 -DLENSFUNDBDIR="/Applications/RawTherapee.app/Contents/Resources/share/lensfun" \
                 -DCMAKE_C_COMPILER=/usr/local/opt/llvm/bin/clang \
