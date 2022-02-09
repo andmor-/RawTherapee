@@ -24,7 +24,7 @@ jobs:
            mkdir build
            date +%s > build/stamp
            brew uninstall --ignore-dependencies libtiff
-           brew install libtiff gtk+3 gtkmm3 gtk-mac-integration adwaita-icon-theme libsigc++@2 little-cms2 libiptcdata fftw lensfun expat pkgconfig libomp shared-mime-info | tee -a depslog
+           brew install libtiff gtk+3 gtkmm3 gtk-mac-integration adwaita-icon-theme libsigc++@2 little-cms2 libiptcdata fftw lensfun expat libomp shared-mime-info | tee -a depslog
            brew unlink libomp
            curl -O https://raw.githubusercontent.com/Homebrew/homebrew-core/fb8323f2b170bd4ae97e1bac9bf3e2983af3fdb0/Formula/libomp.rb
            brew install ./libomp.rb
@@ -45,12 +45,13 @@ jobs:
           cd build && date -u && date +%s > configstamp
           export C_FLAGS=$(echo -e $C_FLAGS | tr -d '\n')
           cmake -DCMAKE_BUILD_TYPE="Release" \
-                -DLOCAL_PREFIX="$(brew --prefix)" \
                 -DPROC_TARGET_NUMBER="2" \
+                -DCMAKE_EXE_LINKER_FLAGS="-L. -L/usr/local/lib -Wl,-rpath -Wl,/usr/local/lib -L/usr/local/opt/gdk-pixbuf/lib -L/usr/local/opt/libiconv/lib -L/usr/local/opt/libffi/lib -L/usr/local/opt/libffi/lib -L/usr/local/opt/libxml2/lib -L/usr/local/opt/expat/lib" \
                 -DCODESIGNID="Apple Development: andre@clarin.eu (LD66Z2PUV6)" \
-                -DCACHE_NAME_SUFFIX="5.8-dev" \
-                -DCMAKE_C_COMPILER="clang" \
-                -DCMAKE_CXX_COMPILER="clang++" \
+                -DCACHE_NAME_SUFFIX="${RAW_THERAPEE_MAJOR}.${RAW_THERAPEE_MINOR}-${REF}" \
+                -DLENSFUNDBDIR="/Applications/RawTherapee.app/Contents/Resources/share/lensfun" \
+                -DCMAKE_C_COMPILER=/usr/local/opt/llvm/bin/clang \
+                -DCMAKE_CXX_COMPILER=/usr/local/opt/llvm/bin/clang++ \
                 -DCMAKE_C_FLAGS="-arch arm64 -Wno-pass-failed -Wno-deprecated-register -Wno-unused-command-line-argument" \
                 -DCMAKE_CXX_FLAGS="-arch arm64 -Wno-pass-failed -Wno-deprecated-register -Wno-unused-command-line-argument" \
                 -DOpenMP_C_FLAGS="${C_FLAGS}" \
@@ -59,6 +60,8 @@ jobs:
                 -DOpenMP_CXX_LIB_NAMES=libomp \
                 -DOpenMP_libomp_LIBRARY=/usr/local/lib/libomp.dylib \
                 -DWITH_LTO="ON" \
+                -DCMAKE_AR=/usr/bin/ar \
+                -DCMAKE_RANLIB=/usr/bin/ranlib \
                 -DCMAKE_OSX_DEPLOYMENT_TARGET="12" \
                 ..
             zsh -c 'echo "Configured in $(printf "%0.2f" $(($[$(date +%s)-$(cat configstamp)]/$((60.))))) minutes"'
