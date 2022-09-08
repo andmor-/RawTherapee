@@ -15,7 +15,7 @@ on:
   workflow_dispatch:
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-10.15
     steps:
       - uses: actions/checkout@v2
       - name: Install dependencies
@@ -44,26 +44,28 @@ jobs:
             -arch arm64 -mtune=generic -Xpreprocessor -fopenmp /usr/local/lib/libomp.dylib -I/usr/local/include -I/usr/local/opt/gdk-pixbuf/include -I/usr/local/opt/libiconv/include -I/usr/local/opt/libxml2/include -I/usr/local/opt/expat/include -I/usr/local/opt/libtiff/include
         run: |
           cd build && date -u && date +%s > configstamp
-          export C_FLAGS=$(echo -e $C_FLAGS | tr -d '\n')
-          cmake -DCMAKE_BUILD_TYPE="Release" \
-                -DPROC_TARGET_NUMBER="2" \
-                -DCMAKE_EXE_LINKER_FLAGS="-L. -L/usr/local/lib -Wl,-rpath -Wl,/usr/local/lib -L/usr/local/opt/gdk-pixbuf/lib -L/usr/local/opt/libiconv/lib -L/usr/local/opt/libffi/lib -L/usr/local/opt/libffi/lib -L/usr/local/opt/libxml2/lib -L/usr/local/opt/expat/lib" \
-                -DCACHE_NAME_SUFFIX="${RAW_THERAPEE_MAJOR}.${RAW_THERAPEE_MINOR}-${REF}" \
-                -DLENSFUNDBDIR="/Applications/RawTherapee.app/Contents/Resources/share/lensfun" \
-                -DCMAKE_C_COMPILER=/usr/local/opt/llvm/bin/clang \
-                -DCMAKE_CXX_COMPILER=/usr/local/opt/llvm/bin/clang++ \
-                -DCMAKE_C_FLAGS="-arch arm64 -Wno-pass-failed -Wno-deprecated-register -Wno-unused-command-line-argument" \
-                -DCMAKE_CXX_FLAGS="-arch arm64 -Wno-pass-failed -Wno-deprecated-register -Wno-unused-command-line-argument" \
-                -DOpenMP_C_FLAGS="${C_FLAGS}" \
-                -DOpenMP_CXX_FLAGS="${C_FLAGS}" \
-                -DOpenMP_C_LIB_NAMES=libomp \
-                -DOpenMP_CXX_LIB_NAMES=libomp \
-                -DOpenMP_libomp_LIBRARY=/usr/local/lib/libomp.dylib \
-                -DWITH_LTO="ON" \
-                -DCMAKE_AR=/usr/bin/ar \
-                -DCMAKE_RANLIB=/usr/bin/ranlib \
-                -DCMAKE_OSX_DEPLOYMENT_TARGET="11" \
-                ..
+          cmake \
+            -DCMAKE_BUILD_TYPE="Release" \
+            -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \
+            -DCMAKE_EXE_LINKER_FLAGS="-L. -L/usr/local/lib -Wl,-rpath -Wl,/usr/local/lib -L/usr/local/opt/gdk-pixbuf/lib -L/usr/local/opt/libiconv/lib -L/usr/local/opt/libffi/lib -L/usr/local/opt/libffi/lib -L/usr/local/opt/libxml2/lib -L/usr/local/opt/expat/lib" \
+            -DCACHE_NAME_SUFFIX="${RAW_THERAPEE_MAJOR}.${RAW_THERAPEE_MINOR}-${REF}" \
+            -DPROC_TARGET_NUMBER="1" \
+            -DPROC_LABEL="generic processor" \
+            -DWITH_LTO="OFF" \
+            -DLENSFUNDBDIR="/Applications/RawTherapee.app/Contents/Resources/share/lensfun" \
+            -DCMAKE_C_COMPILER=clang \
+            -DCMAKE_CXX_COMPILER=clang++ \
+            -DCMAKE_C_FLAGS="-arch x86_64 -Wno-pass-failed -Wno-deprecated-register -Wno-unused-command-line-argument" \
+            -DCMAKE_CXX_FLAGS="-arch x86_64 -Wno-pass-failed -Wno-deprecated-register -Wno-unused-command-line-argument" \
+            -DOpenMP_C_FLAGS="${C_FLAGS}" \
+            -DOpenMP_CXX_FLAGS="${C_FLAGS}" \
+            -DOpenMP_C_LIB_NAMES=libomp \
+            -DOpenMP_CXX_LIB_NAMES=libomp \
+            -DOpenMP_libomp_LIBRARY=/usr/local/lib/libomp.dylib \
+            -DCMAKE_AR=/usr/bin/ar \
+            -DCMAKE_RANLIB=/usr/bin/ranlib \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 \
+            ..
             zsh -c 'echo "Configured in $(printf "%0.2f" $(($[$(date +%s)-$(cat configstamp)]/$((60.))))) minutes"'
       - name: Compile RawTherapee
         run: |
