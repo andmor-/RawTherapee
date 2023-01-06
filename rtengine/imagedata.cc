@@ -19,6 +19,7 @@
 #include <functional>
 
 #include <strings.h>
+#include <time.h>
 
 #include <tiff.h>
 
@@ -57,7 +58,8 @@ template<typename T>
 T getFromFrame(
     const std::vector<std::unique_ptr<FrameData>>& frames,
     std::size_t frame,
-    const std::function<T (const FrameData&)>& function
+    const std::function<T (const FrameData&)>& function,
+    T defval = {}
 )
 {
     if (frame < frames.size()) {
@@ -66,7 +68,7 @@ T getFromFrame(
     if (!frames.empty()) {
         return function(*frames[0]);
     }
-    return {};
+    return defval;
 }
 
 const std::string& validateUft8(const std::string& str, const std::string& on_error = "???")
@@ -85,11 +87,21 @@ FramesMetaData* FramesMetaData::fromFile(const Glib::ustring& fname, std::unique
     return new FramesData(fname, std::move(rml), firstFrameOnly);
 }
 
-FrameData::FrameData(rtexif::TagDirectory* frameRootDir_, rtexif::TagDirectory* rootDir, rtexif::TagDirectory* firstRootDir) :
+static struct tm timeFromTS(const time_t ts)
+{
+#if !defined(WIN32)
+        struct tm tm;
+        return *gmtime_r(&ts, &tm);
+#else
+        return *gmtime(&ts);
+#endif
+}
+
+FrameData::FrameData(rtexif::TagDirectory* frameRootDir_, rtexif::TagDirectory* rootDir, rtexif::TagDirectory* firstRootDir, time_t ts) :
     frameRootDir(frameRootDir_),
     iptc(nullptr),
-    time{},
-    timeStamp{},
+    time(timeFromTS(ts)),
+    timeStamp(ts),
     iso_speed(0),
     aperture(0.),
     focal_len(0.),
@@ -1071,7 +1083,8 @@ tm FramesData::getDateTime(unsigned int frame) const
         [](const FrameData& frame_data)
         {
             return frame_data.getDateTime();
-        }
+        },
+        modTime
     );
 }
 
@@ -1083,7 +1096,8 @@ time_t FramesData::getDateTimeAsTS(unsigned int frame) const
         [](const FrameData& frame_data)
         {
             return frame_data.getDateTimeAsTS();
-        }
+        },
+        modTimeStamp
     );
 }
 
@@ -1369,6 +1383,11 @@ failure:
 FramesData::FramesData(const Glib::ustring& fname, std::unique_ptr<RawMetaDataLocation> rml, bool firstFrameOnly) :
     iptc(nullptr), dcrawFrameCount(0)
 {
+    GStatBuf statbuf = {};
+    g_stat(fname.c_str(), &statbuf);
+    modTimeStamp = statbuf.st_mtime;
+    modTime = timeFromTS(modTimeStamp);
+
     if (rml && (rml->exifBase >= 0 || rml->ciffBase >= 0)) {
         FILE* f = g_fopen(fname.c_str(), "rb");
 
@@ -1387,7 +1406,7 @@ FramesData::FramesData(const Glib::ustring& fname, std::unique_ptr<RawMetaDataLo
 
             // creating FrameData
             for (auto currFrame : exifManager.frames) {
-                frames.push_back(std::unique_ptr<FrameData>(new FrameData(currFrame, currFrame->getRoot(), roots.at(0))));
+                frames.push_back(std::unique_ptr<FrameData>(new FrameData(currFrame, currFrame->getRoot(), roots.at(0), modTimeStamp)));
             }
 
             for (auto currRoot : roots) {
@@ -1413,7 +1432,7 @@ FramesData::FramesData(const Glib::ustring& fname, std::unique_ptr<RawMetaDataLo
                 roots = exifManager.roots;
 
                 for (auto currFrame : exifManager.frames) {
-                    frames.push_back(std::unique_ptr<FrameData>(new FrameData(currFrame, currFrame->getRoot(), roots.at(0))));
+                    frames.push_back(std::unique_ptr<FrameData>(new FrameData(currFrame, currFrame->getRoot(), roots.at(0), modTimeStamp)));
                 }
 
                 rewind(exifManager.f);  // Not sure this is necessary
@@ -1433,7 +1452,7 @@ FramesData::FramesData(const Glib::ustring& fname, std::unique_ptr<RawMetaDataLo
 
             // creating FrameData
             for (auto currFrame : exifManager.frames) {
-                frames.push_back(std::unique_ptr<FrameData>(new FrameData(currFrame, currFrame->getRoot(), roots.at(0))));
+                frames.push_back(std::unique_ptr<FrameData>(new FrameData(currFrame, currFrame->getRoot(), roots.at(0), modTimeStamp)));
             }
 
             for (auto currRoot : roots) {
