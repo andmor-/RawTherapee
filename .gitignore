@@ -32,6 +32,8 @@ install_manifest.txt
 AboutThisBuild.txt
 clean
 
+make_RT_macos_arm64.sh
+*.rb
 *.7z
 *.bz
 *.bz2
